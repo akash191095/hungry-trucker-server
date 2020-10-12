@@ -3,7 +3,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import { json, urlencoded } from "body-parser";
-import { signup, signin, protect } from "./utils/auth";
+import { signup, signin, protect, checkAuth } from "./utils/auth";
 import { connect } from "./utils/db";
 
 dotenv.config();
@@ -15,6 +15,7 @@ app.disable("x-powered-by");
 app.use(
   cors({
     origin: ["http://localhost:3000"],
+    credentials: true,
   })
 );
 app.use(cookieParser());
@@ -26,9 +27,7 @@ app.post("/signup", signup);
 app.post("/signin", signin);
 
 app.use("/api", protect);
-app.get("/api/test", function (req, res) {
-  return res.send(req.user);
-});
+app.get("/api/signin", checkAuth);
 
 // CONNECT
 const port = process.env.PORT || 5000;

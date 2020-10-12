@@ -36,7 +36,7 @@ export const signin = async (req, res) => {
     return res.status(400).send({ message: "need email and password" });
   }
 
-  const invalid = { message: "Invalid email and passoword combination" };
+  const invalid = { message: "Invalid email and password combination" };
 
   try {
     const user = await User.findOne({ email: req.body.email })
@@ -55,12 +55,23 @@ export const signin = async (req, res) => {
 
     const token = newToken(user);
     res.cookie("token", token, { httpOnly: true });
-    return res.status(201).send({ token });
+
+    const fullUser = await User.findById(user._id)
+      .select("-password")
+      .lean()
+      .exec();
+
+    return res.status(201).send(fullUser);
   } catch (e) {
     console.error(e);
     res.status(500).end();
   }
 };
+
+export async function checkAuth(req, res) {
+  if (req.user) return res.send(req.user);
+  return res.status(401).send("Not authenticated");
+}
 
 export const protect = async (req, res, next) => {
   const bearer = req.cookies.token;
