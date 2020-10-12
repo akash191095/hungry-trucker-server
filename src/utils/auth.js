@@ -23,6 +23,7 @@ export const signup = async (req, res) => {
   try {
     const user = await User.create(req.body);
     const token = newToken(user);
+    res.cookie("token", token, { httpOnly: true });
     return res.status(201).send({ token });
   } catch (error) {
     console.log(error);
@@ -53,6 +54,7 @@ export const signin = async (req, res) => {
     }
 
     const token = newToken(user);
+    res.cookie("token", token, { httpOnly: true });
     return res.status(201).send({ token });
   } catch (e) {
     console.error(e);
@@ -61,16 +63,11 @@ export const signin = async (req, res) => {
 };
 
 export const protect = async (req, res, next) => {
-  const bearer = req.headers.authorization;
+  const bearer = req.cookies.token;
 
-  if (!bearer || !bearer.startsWith("Bearer ")) {
-    return res.status(401).end();
-  }
-
-  const token = bearer.split("Bearer ")[1].trim();
   let payload;
   try {
-    payload = await verifyToken(token);
+    payload = await verifyToken(bearer);
   } catch (e) {
     return res.status(401).end();
   }

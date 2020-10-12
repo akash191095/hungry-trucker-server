@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+import cookieParser from "cookie-parser";
 import { json, urlencoded } from "body-parser";
 import { signup, signin, protect } from "./utils/auth";
 import { connect } from "./utils/db";
@@ -16,6 +17,7 @@ app.use(
     origin: ["http://localhost:3000"],
   })
 );
+app.use(cookieParser());
 app.use(json());
 app.use(urlencoded({ extended: true }));
 
@@ -24,6 +26,9 @@ app.post("/signup", signup);
 app.post("/signin", signin);
 
 app.use("/api", protect);
+app.get("/api/test", function (req, res) {
+  return res.send(req.user);
+});
 
 // CONNECT
 const port = process.env.PORT || 5000;
