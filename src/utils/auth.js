@@ -1,6 +1,15 @@
 import jwt from "jsonwebtoken";
 import { User } from "../resources/user/user.model";
 
+const isDevEnv = process.env.NODE_ENV !== "production";
+const cookieOptions = {
+  maxAge: 1000 * 60 * 60 * 24 * 1, // 1 day
+  path: "/",
+  httpOnly: true,
+  secure: isDevEnv ? false : true,
+  sameSite: isDevEnv ? "strict" : "none",
+};
+
 export const newToken = (user) => {
   return jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
     expiresIn: "1d",
@@ -23,7 +32,7 @@ export const signup = async (req, res) => {
   try {
     const user = await User.create(req.body);
     const token = newToken(user);
-    res.cookie("token", token, { httpOnly: true });
+    res.cookie("token", token, cookieOptions);
     const userToSend = user.toObject();
     delete userToSend.password;
     return res.status(201).send(userToSend);
@@ -59,7 +68,7 @@ export const signin = async (req, res) => {
     }
 
     const token = newToken(user);
-    res.cookie("token", token, { httpOnly: true });
+    res.cookie("token", token, cookieOptions);
 
     const fullUser = await User.findById(user._id)
       .select("-password")
