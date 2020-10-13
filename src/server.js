@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
+import serverless from "serverless-http";
 import { json, urlencoded } from "body-parser";
 import { signup, signin, protect, checkAuth } from "./utils/auth";
 import { connect } from "./utils/db";
@@ -37,7 +38,11 @@ export const start = async () => {
     app.listen(port, () => {
       console.log(`REST API on http://localhost:${port}/`);
     });
+    return true;
   } catch (e) {
     console.error(e);
+    return false;
   }
 };
+
+module.exports.handler = serverless(app);
