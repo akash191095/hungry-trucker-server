@@ -1,15 +1,16 @@
-import express from "express";
+import express, { Router } from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import serverless from "serverless-http";
 import { json, urlencoded } from "body-parser";
 import { signup, signin, protect, checkAuth } from "./utils/auth";
-import { connect } from "./utils/db";
+import { connectToDatabase } from "./utils/db";
 
 dotenv.config();
 
 export const app = express();
+const router = Router();
 
 // MIDDLEWARES
 app.disable("x-powered-by");
@@ -24,25 +25,17 @@ app.use(json());
 app.use(urlencoded({ extended: true }));
 
 // ROUTES
-app.post("/signup", signup);
-app.post("/signin", signin);
+router.post("/signup", signup);
+router.post("/signin", signin);
 
-app.use("/api", protect);
-app.get("/api/signin", checkAuth);
+router.use("/api", protect);
+router.get("/api/signin", checkAuth);
+
+app.use("/.netlify/functions/server", router); // path must route to lambda (needed for serverless)
 
 // CONNECT
-const port = process.env.PORT || 5000;
-export const start = async () => {
-  try {
-    await connect();
-    app.listen(port, () => {
-      console.log(`REST API on http://localhost:${port}/`);
-    });
-    return true;
-  } catch (e) {
-    console.error(e);
-    return false;
-  }
+const handler = serverless(app);
+module.exports.handler = async (event, context) => {
+  await connectToDatabase();
+  return await handler(event, context);
 };
-
-module.exports.handler = serverless(app);

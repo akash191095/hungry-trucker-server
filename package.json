@@ -4,14 +4,15 @@
   "description": "backend server for hungry trucker",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon --exec babel-node src/index.js",
-    "build": "babel src --out-dir dist",
+    "start": "nodemon --exec babel-node index.js",
+    "build": "babel src --out-dir build",
     "start-prod": "node ./dist/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "akash191095",
   "license": "ISC",
   "dependencies": {
+    "aws-sdk": "^2.771.0",
     "babel-plugin-inline-dotenv": "^1.6.0",
     "bcrypt": "^5.0.0",
     "body-parser": "^1.19.0",
