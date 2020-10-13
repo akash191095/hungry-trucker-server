@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import serverless from "serverless-http";
 import { json, urlencoded } from "body-parser";
-import { signup, signin, protect, checkAuth } from "./utils/auth";
+import { signup, signin, protect, checkAuth, signout } from "./utils/auth";
 import { connectToDatabase } from "./utils/db";
 
 dotenv.config();
@@ -31,6 +31,7 @@ app.use(urlencoded({ extended: true }));
 // ROUTES
 router.post("/signup", signup);
 router.post("/signin", signin);
+router.get("/signout", signout);
 
 router.use("/api", protect);
 router.get("/api/signin", checkAuth);

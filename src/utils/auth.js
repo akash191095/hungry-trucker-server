@@ -67,11 +67,20 @@ export const signin = async (req, res) => {
       .exec();
 
     return res.status(201).send(fullUser);
-  } catch (e) {
-    console.error(e);
+  } catch (error) {
+    console.error(error);
     res.status(500).end();
   }
 };
+
+export async function signout(req, res) {
+  try {
+    res.clearCookie("token");
+    return res.send();
+  } catch (error) {
+    console.log(error);
+  }
+}
 
 export async function checkAuth(req, res) {
   if (req.user) return res.send(req.user);
@@ -84,7 +93,7 @@ export const protect = async (req, res, next) => {
   let payload;
   try {
     payload = await verifyToken(bearer);
-  } catch (e) {
+  } catch (error) {
     return res.status(401).end();
   }
 
