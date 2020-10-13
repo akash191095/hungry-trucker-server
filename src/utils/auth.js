@@ -2,14 +2,14 @@ import jwt from "jsonwebtoken";
 import { User } from "../resources/user/user.model";
 
 export const newToken = (user) => {
-  return jwt.sign({ id: user.id }, process.env.JWT_SECRECT, {
+  return jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
     expiresIn: "1d",
   });
 };
 
 export const verifyToken = (token) =>
   new Promise((resolve, reject) => {
-    jwt.verify(token, process.env.JWT_SECRECT, (err, payload) => {
+    jwt.verify(token, process.env.JWT_SECRET, (err, payload) => {
       if (err) return reject(err);
       resolve(payload);
     });
@@ -24,9 +24,14 @@ export const signup = async (req, res) => {
     const user = await User.create(req.body);
     const token = newToken(user);
     res.cookie("token", token, { httpOnly: true });
-    return res.status(201).send({ token });
+    const userToSend = user.toObject();
+    delete userToSend.password;
+    return res.status(201).send(userToSend);
   } catch (error) {
     console.log(error);
+    if (error.code === 11000) {
+      return res.status(400).send({ message: "Email already exists" });
+    }
     return res.status(500).end();
   }
 };
