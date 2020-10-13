@@ -16,7 +16,11 @@ const router = Router();
 app.disable("x-powered-by");
 app.use(
   cors({
-    origin: ["http://localhost:3000"],
+    origin: [
+      "http://localhost:3000",
+      "http://localhost:5000",
+      "https://fervent-elion-a03cef.netlify.app",
+    ],
     credentials: true,
   })
 );
