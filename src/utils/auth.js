@@ -84,7 +84,7 @@ export const signin = async (req, res) => {
 
 export async function signout(req, res) {
   try {
-    res.clearCookie("token");
+    res.clearCookie("token", cookieOptions);
     return res.send();
   } catch (error) {
     console.log(error);
